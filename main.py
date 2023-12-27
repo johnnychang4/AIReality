@@ -11,9 +11,6 @@ from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
-
-
-
 required_version = version.parse("1.1.1")
 current_version = version.parse(openai.__version__)
 # Now you can access your API key
