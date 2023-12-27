@@ -1,0 +1,16 @@
+{
+    "Character": {
+      "Name": "Harry Potter",
+      "PersonalityScores": {
+        "Introverted": 60,  // Harry is somewhat introverted, often reflective and reserved.
+        "Extraverted": 40,  // He can be social but usually doesn't seek out large groups.
+        "Sensing": 55,      // Harry is practical and often relies on concrete information.
+        "Intuition": 45,    // He is less intuitive, more focused on the present than possibilities.
+        "Thinking": 45,     // Harry tends to be more emotional in his decision-making.
+        "Feeling": 55,      // He often makes decisions based on personal values and emotions.
+        "Perceiving": 60,   // Harry is adaptable, often spontaneous and less structured.
+        "Judging": 40       // He is less inclined to planning and prefers flexibility.
+      }
+    }
+  }
+  

@@ -12,29 +12,25 @@ load_dotenv()
 
 # Now you can access your API key
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
-
-#OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
-#AIRTABLE_API_KEY = os.environ['AIRTABLE_API_KEY']
 
 # Init OpenAI Client
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 # Add lead to Airtable
-def create_lead(name, phone):
-  url = "https://api.airtable.com/v0/appg9Gl6U3S5prIw7/Accelerator%20Leads"
-  headers = {
-      "Authorization": AIRTABLE_API_KEY,
-      "Content-Type": "application/json"
-  }
-  data = {"records": [{"fields": {"Name": name, "Phone": phone}}]}
-  response = requests.post(url, headers=headers, json=data)
-  if response.status_code == 200:
-    print("Lead created successfully.")
-    return response.json()
-  else:
-    print(f"Failed to create lead: {response.text}")
+# def create_lead(name, phone):
+#   url = "https://api.airtable.com/v0/appg9Gl6U3S5prIw7/Accelerator%20Leads"
+#   headers = {
+#       "Authorization": AIRTABLE_API_KEY,
+#       "Content-Type": "application/json"
+#   }
+#   data = {"records": [{"fields": {"Name": name, "Phone": phone}}]}
+#   response = requests.post(url, headers=headers, json=data)
+#   if response.status_code == 200:
+#     print("Lead created successfully.")
+#     return response.json()
+#   else:
+#     print(f"Failed to create lead: {response.text}")
 
 
 # Create or load assistant
@@ -52,7 +48,10 @@ def create_assistant(client):
 
     # To change the knowledge document, modify the file name below to match your document
     # If you want to add multiple files, paste this function into ChatGPT and ask for it to add support for multiple files
-    file = client.files.create(file=open("knowledge.docx", "rb"),
+    # file = client.files.create(file=open("knowledge.docx", "rb"),
+    #                            purpose='assistants')
+
+    file = client.files.create(file=open("knowledge.json", "rb"),
                                purpose='assistants')
 
     assistant = client.beta.assistants.create(
