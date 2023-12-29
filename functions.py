@@ -64,28 +64,28 @@ def create_assistant(client):
                 "type": "retrieval"  # This adds the knowledge base as a tool
             },
             {
-                "type": "function",  # This adds the lead capture as a tool
-                "function": {
-                    "name": "create_lead",
-                    "description":
-                    "Capture lead details and save to Airtable.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "description": "Full name of the lead."
-                            },
-                            "phone": {
-                                "type":
-                                "string",
-                                "description":
-                                "Phone number of the lead including country code."
-                            }
-                        },
-                        "required": ["name", "phone"]
-                    }
-                }
+                # "type": "function",  # This adds the lead capture as a tool
+                # "function": {
+                #     "name": "create_lead",
+                #     "description":
+                #     "Capture lead details and save to Airtable.",
+                #     "parameters": {
+                #         "type": "object",
+                #         "properties": {
+                #             "name": {
+                #                 "type": "string",
+                #                 "description": "Full name of the lead."
+                #             },
+                #             "phone": {
+                #                 "type":
+                #                 "string",
+                #                 "description":
+                #                 "Phone number of the lead including country code."
+                #             }
+                #         },
+                #         "required": ["name", "phone"]
+                #     }
+                # }
             }
         ],
         file_ids=[world_model_file.id, character_model_file.id])
@@ -108,13 +108,17 @@ def document_convert_to_string(filename):
         fullText.append(para.text)
     return '\n'.join(fullText)
 
+def get_timestamp(): 
+    #
+    #
+
 # Real-time clock
 def start_periodic_check(interval, function, *args):
-    next_call = time.time()
-    while True:
-        function(*args)
-        next_call = next_call + interval
-        time.sleep(next_call - time.time())
+    # next_call = time.time()
+    # while True:
+    #     function(*args)
+    #     next_call = next_call + interval
+    #     time.sleep(next_call - time.time())
 
 # 
 def get_world_events_since_p(assistant_id, thread_id):

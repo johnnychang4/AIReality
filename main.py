@@ -9,39 +9,45 @@ from packaging import version
 from dotenv import load_dotenv
 
 
-# Load environment variables from .env file
+# INITIALIZATION: -----------------------------------------------------------------------------------------------------
+# 1. Load environment variables and system
 load_dotenv()
 required_version = version.parse("1.1.1")
 current_version = version.parse(openai.__version__)
-# Now you can access your API key
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-#OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 if current_version < required_version:
   raise ValueError(
       f"Error: OpenAI version {openai.__version__} is less than the required version 1.1.1"
   )
 else:
   print("OpenAI version is compatible.")
-
 app = Flask(__name__)
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# Load assistant ID from file or create new one
+# 2. Create the assitant
 assistant_id = functions.create_assistant(client)
 print("Assistant created with ID:", assistant_id)
 
-# Handling how the App should respond to the incoming REST request
-# Create thread
+# 3. Create the thread for the conversation initialzied by the user
 @app.route('/start', methods=['GET'])
 def start_conversation():
   thread = client.beta.threads.create()
   print("New conversation started with thread ID:", thread.id)
   return jsonify({"thread_id": thread.id})
+# ---------------------------------------------------------------------------------------------------------------------
 
 
-# Start run
+
+
+
+# COMMUNICATION : ------------------------------------------------------------------------
+# 1. This function is triggered when the user sends a whatsapp message: 
+#    - Receive [message] from user
+#    - Generate a current [timestamp] 
+#    - Send [timestamp + message] to the AI Assistant
 @app.route('/chat', methods=['POST'])
-def chat():
+def message_from_user_into_assitant(): 
+# - Receive [message] from user: 
   data = request.json
   thread_id = data.get('thread_id')
   user_input = data.get('message', '')
@@ -50,17 +56,50 @@ def chat():
     return jsonify({"error": "Missing thread_id"}), 400
   print("Received message for thread ID:", thread_id, "Message:", user_input)
 
-  # Start run and send run ID back to ManyChat
+# - Generate a current [timestamp]: 
+
+
+
+
+
+
+
+# - Send [timestamp + message] to the AI Assistant:
   client.beta.threads.messages.create(thread_id=thread_id,
                                       role="user",
-                                      content=user_input)
+                                      content= user_input)
+
+
+  # client.beta.threads.messages.create(thread_id=thread_id,
+  #                                     role="user",
+  #                                     content= [timestamp + user_input])
+
+
   run = client.beta.threads.runs.create(thread_id=thread_id,
                                         assistant_id=assistant_id)
   print("Run started with ID:", run.id)
+
+  # send run ID back to ManyChat:
   return jsonify({"run_id": run.id})
 
+# 2. This function is triggered by the system to AI Assistant: 
+#    -  Generate a specified [timestamp[specified_timestamp]],
+#    -  Send "[Timestamp] World Status Update Request: What is happening right now?" to AI Assistant
 
-# Check status of run
+def message_from_system_into_assitant():
+  # - Generate a current [timestamp]: 
+
+
+  message = "World Status Update Request: What is happening right now?"
+
+
+  # Send "[Timestamp] World Status Update Request: What is happening right now?" to AI Assistant:
+  client.beta.threads.messages.create(thread_id=thread_id,
+                                      role="user",
+                                      content=user_input)
+
+
+# 3. Check for status to see if there are functions_callings need to be run
 @app.route('/check', methods=['POST'])
 def check_run_status():
   data = request.json
@@ -111,7 +150,19 @@ def check_run_status():
 
   print("Run timed out")
   return jsonify({"response": "timeout"})
+# ---------------------------------------------------------------------------------------------------------------------
 
 
+
+
+# COMMUNICATION BETWEEN SYSTEM AND AI MODEL: --------------------------------------------------------------------------
+# 1. Send
+# Call 
+
+# ---------------------------------------------------------------------------------------------------------------------
+
+
+
+# PORTAL CONTROL: -----------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=8080)

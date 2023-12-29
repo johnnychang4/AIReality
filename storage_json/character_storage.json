@@ -1,6 +1,16 @@
 {
   "Character": {
-    "Name": "Harry Potter",
+    "Name": "Ron",
+    "Personality": {
+      "Introverted": 60,  
+      "Extraverted": 40,  
+      "Sensing": 55,      
+      "Intuition": 45,   
+      "Thinking": 45,     
+      "Feeling": 55,     
+      "Perceiving": 60,   
+      "Judging": 40      
+    },
     "Skills_Abilities": {
       "Quidditch": "Skilled Seeker",
       "Defense_Against_the_Dark_Arts": "High proficiency",
