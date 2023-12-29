@@ -85,7 +85,6 @@ def message_from_user_into_assitant():
 # 2. This function is triggered by the system to AI Assistant: 
 #    -  Generate a specified [timestamp[specified_timestamp]],
 #    -  Send "[Timestamp] World Status Update Request: What is happening right now?" to AI Assistant
-
 def message_from_system_into_assitant():
   # - Generate a current [timestamp]: 
 
@@ -117,6 +116,7 @@ def check_run_status():
     print("Checking run status:", run_status.status)
 
     if run_status.status == 'completed':
+      # Get the message from AI and send it to the ManyChat
       messages = client.beta.threads.messages.list(thread_id=thread_id)
       message_content = messages.data[0].content[0].text
       # Remove annotations
@@ -125,6 +125,7 @@ def check_run_status():
         message_content.value = message_content.value.replace(
             annotation.text, '')
       print("Run completed, returning response")
+      print(message_content.value) 
       return jsonify({
           "response": message_content.value,
           "status": "completed"
@@ -152,14 +153,6 @@ def check_run_status():
   return jsonify({"response": "timeout"})
 # ---------------------------------------------------------------------------------------------------------------------
 
-
-
-
-# COMMUNICATION BETWEEN SYSTEM AND AI MODEL: --------------------------------------------------------------------------
-# 1. Send
-# Call 
-
-# ---------------------------------------------------------------------------------------------------------------------
 
 
 

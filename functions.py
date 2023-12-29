@@ -108,17 +108,13 @@ def document_convert_to_string(filename):
         fullText.append(para.text)
     return '\n'.join(fullText)
 
-def get_timestamp(): 
-    #
-    #
-
 # Real-time clock
 def start_periodic_check(interval, function, *args):
-    # next_call = time.time()
-    # while True:
-    #     function(*args)
-    #     next_call = next_call + interval
-    #     time.sleep(next_call - time.time())
+    next_call = time.time()
+    while True:
+        function(*args)
+        next_call = next_call + interval
+        time.sleep(next_call - time.time())
 
 # 
 def get_world_events_since_p(assistant_id, thread_id):
