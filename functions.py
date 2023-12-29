@@ -3,38 +3,33 @@ import requests
 import os
 from openai import OpenAI
 from prompts import assistant_instructions
-
 from dotenv import load_dotenv
 
 
 # Load environment variables from .env file
-load_dotenv()
+# load_dotenv()
 
 # Now you can access your API key
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
-
-#OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
-#AIRTABLE_API_KEY = os.environ['AIRTABLE_API_KEY']
+# OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Init OpenAI Client
-client = OpenAI(api_key=OPENAI_API_KEY)
+# client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 # Add lead to Airtable
-def create_lead(name, phone):
-  url = "https://api.airtable.com/v0/appg9Gl6U3S5prIw7/Accelerator%20Leads"
-  headers = {
-      "Authorization": AIRTABLE_API_KEY,
-      "Content-Type": "application/json"
-  }
-  data = {"records": [{"fields": {"Name": name, "Phone": phone}}]}
-  response = requests.post(url, headers=headers, json=data)
-  if response.status_code == 200:
-    print("Lead created successfully.")
-    return response.json()
-  else:
-    print(f"Failed to create lead: {response.text}")
+# def create_lead(name, phone):
+#   url = "https://api.airtable.com/v0/appg9Gl6U3S5prIw7/Accelerator%20Leads"
+#   headers = {
+#       "Authorization": AIRTABLE_API_KEY,
+#       "Content-Type": "application/json"
+#   }
+#   data = {"records": [{"fields": {"Name": name, "Phone": phone}}]}
+#   response = requests.post(url, headers=headers, json=data)
+#   if response.status_code == 200:
+#     print("Lead created successfully.")
+#     return response.json()
+#   else:
+#     print(f"Failed to create lead: {response.text}")
 
 
 # Create or load assistant
@@ -52,7 +47,12 @@ def create_assistant(client):
 
     # To change the knowledge document, modify the file name below to match your document
     # If you want to add multiple files, paste this function into ChatGPT and ask for it to add support for multiple files
-    file = client.files.create(file=open("knowledge.docx", "rb"),
+    # file = client.files.create(file=open("knowledge.docx", "rb"),
+    #                            purpose='assistants')
+
+    world_model_file = client.files.create(file=open("storage_json/world_storage.json", "rb"),
+                               purpose='assistants')
+    character_model_file = client.files.create(file=open("storage_json/character_storage.json", "rb"),
                                purpose='assistants')
 
     assistant = client.beta.assistants.create(
@@ -64,31 +64,31 @@ def create_assistant(client):
                 "type": "retrieval"  # This adds the knowledge base as a tool
             },
             {
-                "type": "function",  # This adds the lead capture as a tool
-                "function": {
-                    "name": "create_lead",
-                    "description":
-                    "Capture lead details and save to Airtable.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "description": "Full name of the lead."
-                            },
-                            "phone": {
-                                "type":
-                                "string",
-                                "description":
-                                "Phone number of the lead including country code."
-                            }
-                        },
-                        "required": ["name", "phone"]
-                    }
-                }
+                # "type": "function",  # This adds the lead capture as a tool
+                # "function": {
+                #     "name": "create_lead",
+                #     "description":
+                #     "Capture lead details and save to Airtable.",
+                #     "parameters": {
+                #         "type": "object",
+                #         "properties": {
+                #             "name": {
+                #                 "type": "string",
+                #                 "description": "Full name of the lead."
+                #             },
+                #             "phone": {
+                #                 "type":
+                #                 "string",
+                #                 "description":
+                #                 "Phone number of the lead including country code."
+                #             }
+                #         },
+                #         "required": ["name", "phone"]
+                #     }
+                # }
             }
         ],
-        file_ids=[file.id])
+        file_ids=[world_model_file.id, character_model_file.id])
 
     # Create a new assistant.json file to load on future runs
     with open(assistant_file_path, 'w') as file:
@@ -98,3 +98,31 @@ def create_assistant(client):
     assistant_id = assistant.id
 
   return assistant_id
+
+
+# Convert the text from the documentation to the string
+def document_convert_to_string(filename):
+    doc = Document(filename)
+    fullText = []
+    for para in doc.paragraphs:
+        fullText.append(para.text)
+    return '\n'.join(fullText)
+
+def get_timestamp(): 
+    #
+    #
+
+# Real-time clock
+def start_periodic_check(interval, function, *args):
+    # next_call = time.time()
+    # while True:
+    #     function(*args)
+    #     next_call = next_call + interval
+    #     time.sleep(next_call - time.time())
+
+# 
+def get_world_events_since_p(assistant_id, thread_id):
+    """Retrieve events from the world model since a given timestamp promptammatically."""
+    run_id = assistant.send_message(assistant_id, thread_id, str(timestamp) + ": " + prompts.get_world_updates)
+    response = assistant.receive_responses(thread_id, run_id)
+    print(response)

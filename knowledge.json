@@ -1,0 +1,16 @@
+{
+    "Character": {
+      "Name": "Harry Potter",
+      "PersonalityScores": {
+        "Introverted": 60,  
+        "Extraverted": 40,  
+        "Sensing": 55,      
+        "Intuition": 45,   
+        "Thinking": 45,     
+        "Feeling": 55,     
+        "Perceiving": 60,   
+        "Judging": 40      
+      }
+    }
+  }
+  
