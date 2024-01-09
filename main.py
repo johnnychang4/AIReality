@@ -2,6 +2,7 @@ import json
 import os
 import threading
 import time
+import re
 from datetime import datetime
 
 from flask import Flask, request, jsonify
@@ -73,6 +74,8 @@ def message_from_user_into_assistant():
         return jsonify({"error": "Missing thread_id"}), 400
     print("Received message for thread ID:", thread_id, "Message:", user_input)
 
+    # TODO test if timestamp and parsing works
+
     # - Generate a current [timestamp]:
 
     current_time = functions.generate_current_time()
@@ -84,9 +87,22 @@ def message_from_user_into_assistant():
     run_id = Client.send_message(assistant_id, thread_id, modified_user_message)
     print("Run started with ID:", run_id)
 
-    # TODO Parse the response into A. message to user B. update for character file
-    # Make sure that response to user is only send when Potter not busy anymore (delay)
     response = Client.receive_messages(assistant_id, thread_id)
+
+    # Extract the timestamp
+    timestamp_regex = r"Expected text response time: \[(.*?)\]"
+    desired_time = re.search(timestamp_regex, response).group(1)
+
+    # Extract the message to the user
+    message_regex = r"Harry Potter’s response to text message: \"(.*?)\""
+    message = re.search(message_regex, response).group(1)
+
+    # Extract the character file update
+    character_file_update_regex = r"Character File Update:\n\n([\s\S]*?)\n\n"
+    character_file_update = re.search(character_file_update_regex, response).group(1).strip()
+
+    # TODO 1. Send message back to user 2. Write to character file
+    # thread = threading.Thread(target=call_endpoint_at_time, args=(url, desired_time))
 
     # send run ID back to ManyChat:
     return jsonify({"run_id": run_id})

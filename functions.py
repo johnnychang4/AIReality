@@ -132,7 +132,6 @@ def generate_current_time():
 #    -  Generate a specified [timestamp[specified_timestamp]],
 #    -  Send "[Timestamp] World Status Update Request: What is happening right now?" to AI Assistant
 def message_from_system_into_assistant(assistant_id, thread_id):
-
     # 1. Query world state for updates
     current_time = generate_current_time()
     message = "[" + current_time + "]" + prompts.get_world_updates
@@ -144,3 +143,11 @@ def message_from_system_into_assistant(assistant_id, thread_id):
     # TODO Parse answer into A. world updates B. Potters internal thought and write
 
 
+def call_endpoint_at_time(url, desired_time):
+    # Calculate the delay in seconds
+    delay = (desired_time - datetime.now()).total_seconds()
+
+    # If the time is in the future, wait until that time
+    if delay > 0:
+        time.sleep(delay)
+    # TODO Make the call to the endpoint
