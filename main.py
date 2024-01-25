@@ -30,7 +30,7 @@ thread = client.beta.threads.create()
 print("New conversation started with thread ID:", thread.id)
 
 # 4. Start the system thread for world updates to the Assistant API
-interval = OPENAI_API_KEY = os.getenv('WORLD_UPDATE_INTERVAL')
+interval = os.getenv('WORLD_UPDATE_INTERVAL')
 system_thread = threading.Thread(target=functions.start_periodic_check,
                                  args=(interval, functions.message_from_system_into_assistant, client, assistant_id,
                                        thread.id))
