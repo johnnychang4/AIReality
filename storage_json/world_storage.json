@@ -1,59 +1,12 @@
 {
-  "World": {
-    "Name": "Wizarding World",
-    "Description": "A complex, hidden magical world with its unique culture, laws, and conflicts, interwoven with the non-magical world.",
-    "Event_History": [
-      {
-        "Timestamp": "1991-09-01",
-        "Event": "Harry Potter's first year at Hogwarts",
-        "Impact": "Introduction of Harry to the wizarding world, start of a significant era."
-      }
-    ],
-    "Geography": {
-      "Locations": [
-        "Hogwarts",
-        "Diagon Alley",
-        "Hogsmeade",
-        "The Ministry of Magic",
-        "Azkaban"
-      ],
-      "Magical_Properties": {
-        "Hogwarts": "Enchanted protections, Room of Requirement"
-      }
+  "world_events": [
+    {
+      "timestamp": "2024/01/17 10:00:00",
+      "event_description": "Harry, Ron, and Hermione start their day with breakfast at the Great Hall, discussing their plans for the day."
     },
-    "Political_Structure": {
-      "Government": "Ministry of Magic",
-      "Laws": [
-        "The International Statute of Wizarding Secrecy",
-        "Prohibition of Underage Sorcery"
-      ],
-      "Political_Factions": ["Order of the Phoenix", "Death Eaters"]
-    },
-    "Cultural_Aspects": {
-      "Traditions": [
-        "Triwizard Tournament",
-        "Quidditch World Cup",
-        "Celebration of Halloween and Christmas"
-      ],
-      "Education_System": ["Hogwarts", "Beauxbatons", "Durmstrang"],
-      "Cultural_Beliefs": ["Pureblood supremacy", "House-elf rights"]
-    },
-    "Economy": {
-      "Currency": "Galleons, Sickles, Knuts",
-      "Major_Businesses": [
-        "Gringotts Bank",
-        "Ollivanders Wand Shop",
-        "Weasleys' Wizard Wheezes"
-      ],
-      "Trade": "Potions ingredients, magical artifacts, brooms"
-    },
-    "Magical_Creatures": {
-      "House_Elves": "Servitude, magical abilities",
-      "Dragons": "Species, habitats, uses in the wizarding world"
-    },
-    "Mysteries_and_Legends": {
-      "The Deathly Hallows": "Origin, significance, and impact",
-      "Prophecies": "Role in shaping events"
+    {
+      "timestamp": "2024/01/17 11:30:00",
+      "event_description": "During Potions class, Harry accidentally mixes the wrong ingredients, causing a minor explosion."
     }
-  }
+  ]
 }
