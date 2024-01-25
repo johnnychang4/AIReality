@@ -108,7 +108,7 @@ def parse_world_message(response):
     print(response)
     # 1. Append to world file
     # TODO Check this regex, runs into problems sometimes
-    world_file_pattern = re.compile(r'\[Time\] "(.+?)"\s+\[Output\] "(.+?)"', re.DOTALL)
+    world_file_pattern = re.compile(r'!Time! "(.+?)"\s+!Output! "(.+?)"', re.DOTALL)
     world_file_match = world_file_pattern.search(response)
     world_event = {
         'timestamp': world_file_match.group(1),
@@ -118,7 +118,7 @@ def parse_world_message(response):
 
     # 2. Adjust character file
     user_file_pattern = re.compile(
-        r'\[Current Time Stamp\] "(.+?)"\s+\[Character’s Memory\] "(.+?)"\s+\[Is Harry texting the user\?\] (\w+)(:.*?)?\s+\[Other keys to be updated\?\] (\w+)(: ".*?")?',
+        r'!Current Time Stamp! "(.+?)"\s+!Character Memory! "(.+?)"\s+!Is Harry texting the user\?! (\w+)(:.*?)?\s+!Other keys to be updated\?! (\w+)(: ".*?")?',
         re.DOTALL)
     user_file_match = user_file_pattern.search(response)
 
