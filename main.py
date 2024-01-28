@@ -40,7 +40,7 @@ system_thread.start()
 
 
 while True:
-    # TODO Hunter - Receive that from ManyChat
+    # TODO Hunter - Receive that from ManyChat:
     user_input = input("Enter your message (or 'exit' to quit): ")
     if user_input.lower() == 'exit':
         break
@@ -50,9 +50,15 @@ while True:
     modified_user_message = "[Time] " + current_time + " [Text from User] " + user_input
 
     # Send message to Assistant API
-    run_id = functions.send_message(client, assistant_id, thread.id, modified_user_message)
-    print("Run started with ID:", run_id)
-
+    scheduled = True
+    run_id = None
+    while scheduled:
+        try:
+            run_id = functions.send_message(client, assistant_id, thread.id, modified_user_message)
+            scheduled = False
+            print("Run started with ID:", run_id)
+        except:
+            time.sleep(5)
     # Receive message from Assistant API
     start_time = time.time()
     while time.time() - start_time < 8:
@@ -62,8 +68,8 @@ while True:
         response_time = character_answer["Expected response time"]
         # delay = response_time - current_time
         delay = 0
-        # If the desired time is in the future, delay the print
-        # TODO Hunter - Send that to ManyChat
+
+        # TODO Hunter - Send that to ManyChat:
         if delay > 0:
             time.sleep(delay)
             print(character_answer["Harry response to text message"])
