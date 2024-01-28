@@ -56,7 +56,7 @@ def generate_current_time():
 
 def parse_user_message(message):
     # Extract the values of the relevant variables using regular expressions
-    variables = re.findall(r'\[(.*?)] (.*?)\n', message)
+    variables = re.findall(r'\!(.*?)\! (.*?)\n', message)
     variables_dict = {var[0]: var[1] for var in variables}
     return variables_dict
 
@@ -108,7 +108,8 @@ def parse_world_message(response):
     print(response)
     # 1. Append to world file
     # TODO Check this regex, runs into problems sometimes
-    world_file_pattern = re.compile(r'\!Time\! "(.+?)"\s+\!Output\! "(.+?)"', re.DOTALL)
+    #world_file_pattern = re.compile(r'\!Time\! "(.+?)"\s+\!Output\! "(.+?)"', re.DOTALL)
+    world_file_pattern = re.compile(r'!Time!\s+(.+?)\s+!Output!\s+(.+)', re.DOTALL)
     world_file_match = world_file_pattern.search(response)
     if world_file_match:
         # Extract the matched groups
@@ -119,11 +120,10 @@ def parse_world_message(response):
         append_event_to_world(world_event)
     else:
         print("No match found in the response.")
-    append_event_to_world(world_event)
 
     # 2. Adjust character file
     user_file_pattern = re.compile(
-        r'\!Current Time Stamp\! "(.+?)"\s+\!Character Memory\! "(.+?)"\s+\!Is Harry texting the user\?\! (\w+)(:.*?)?\s+\!Other keys to be updated\?\! (\w+)(: ".*?")?',
+        r'\!Current Time Stamp\!\s+(.+?)\s+\!Character Memory\!\s+([\s\S]+?)\s+\!Is Harry texting the user\?\!\s+(\w+):\s*"?([\s\S]+?)"?\s+\!Other keys to be updated\?\!\s+(\w+)',
         re.DOTALL)
     user_file_match = user_file_pattern.search(response)
 
@@ -140,7 +140,7 @@ def parse_world_message(response):
         print(message_to_user)
 
     # Handling "Other keys to be updated?"
-    other_keys_pattern = re.compile(r'([^:]+): ([^:]+)')  # TODO Check if it works with several keys
+    other_keys_pattern = re.compile(r'([^:]+): ([^:]+)')
     other_keys = user_file_match.group(5)
     if other_keys == "YES":
         other_keys_data = user_file_match.group(6)
@@ -169,7 +169,7 @@ def message_from_system_into_assistant(client, assistant_id, thread_id):
     message = f"""
     [Character file] {character}
     [World file] {world} 
-    [Time] {current_time}
+        [Time] {current_time}
     [World Status Update Request] What is happening right now?
     """
 

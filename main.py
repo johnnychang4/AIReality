@@ -40,6 +40,7 @@ system_thread.start()
 
 
 while True:
+    # TODO Hunter - Receive that from ManyChat
     user_input = input("Enter your message (or 'exit' to quit): ")
     if user_input.lower() == 'exit':
         break
@@ -59,11 +60,12 @@ while True:
         character_answer = functions.parse_user_message(res)
         current_time = time.time()
         response_time = character_answer["Expected response time"]
-        # TODO can activate if interested:delay = response_time - current_time
+        # delay = response_time - current_time
         delay = 0
         # If the desired time is in the future, delay the print
+        # TODO Hunter - Send that to ManyChat
         if delay > 0:
             time.sleep(delay)
-            print(character_answer["Harry’s response to text message"])
+            print(character_answer["Harry response to text message"])
         else:
-            print(character_answer["Harry’s response to text message"])
+            print(character_answer["Harry response to text message"])
