@@ -50,28 +50,24 @@ while True:
     modified_user_message = "[Time] " + current_time + " [Text from User] " + user_input
 
     # Send message to Assistant API
-    scheduled = True
-    run_id = None
-    while scheduled:
-        try:
-            run_id = functions.send_message(client, assistant_id, thread.id, modified_user_message)
-            scheduled = False
-            print("Run started with ID:", run_id)
-        except:
-            time.sleep(5)
-    # Receive message from Assistant API
-    start_time = time.time()
-    while time.time() - start_time < 8:
-        res = functions.receive_messages(client, thread.id, run_id)
-        character_answer = functions.parse_user_message(res)
-        current_time = time.time()
-        response_time = character_answer["Expected response time"]
-        # delay = response_time - current_time
-        delay = 0
+    will_user_answer = True
+    try:
+        run_id = functions.send_message(client, assistant_id, thread.id, modified_user_message)
+        print("Run started with ID:", run_id)
+        start_time = time.time()
+        while time.time() - start_time < 8:
+            res = functions.receive_messages(client, thread.id, run_id)
+            character_answer = functions.parse_user_message(res)
+            current_time = time.time()
+            response_time = character_answer["Expected response time"]
+            # delay = response_time - current_time
+            delay = 0
 
-        # TODO Hunter - Send that to ManyChat:
-        if delay > 0:
-            time.sleep(delay)
-            print(character_answer["Harry response to text message"])
-        else:
-            print(character_answer["Harry response to text message"])
+            # TODO Hunter - Send that to ManyChat:
+            if delay > 0:
+                time.sleep(delay)
+                print(character_answer["Harry response to text message"])
+            else:
+                print(character_answer["Harry response to text message"])
+    except:
+        print("The user just does not answer")
