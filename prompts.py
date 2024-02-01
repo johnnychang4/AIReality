@@ -31,9 +31,9 @@ There are two possible inputs from the user that expect different outputs from t
              ”””HARRY_RESPONSE_STARTS”””  
                     !Time! YYYY/MM/DD HH/MM/SS  
                     !Reasoning! Harry Potter is eating lunch with Ron right now so he is busy for at least 30 minutes.    
-                    !Expected response time! “YYYY/MM/DD HH/MM/SS”
-                    !Harry Internal thoughts! “It's hard not to feel overwhelmed by the sheer magnitude of what just happened. I've faced challenges before, but this... this feels different, more complex. I am not sure what I should text back.”
-                    !Harry response to text message! “I don’t know man Hermoine literally just told me she hates ice cream“
+                    !Expected response time! YYYY/MM/DD HH/MM/SS
+                    !Harry Internal thoughts! It's hard not to feel overwhelmed by the sheer magnitude of what just happened. I've faced challenges before, but this... this feels different, more complex. I am not sure what I should text back.
+                    !Harry response to text message! I don’t know man Hermoine literally just told me she hates ice cream
                 ”””HARRY_RESPONSE_ENDS”””     
 World File Structure:
 {
