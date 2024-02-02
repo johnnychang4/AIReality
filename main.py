@@ -55,19 +55,18 @@ while True:
         run_id = functions.send_message(client, assistant_id, thread.id, modified_user_message)
         print("Run started with ID:", run_id)
         start_time = time.time()
-        while time.time() - start_time < 8:
-            res = functions.receive_messages(client, thread.id, run_id)
-            character_answer = functions.parse_user_message(res)
-            current_time = time.time()
-            response_time = character_answer["Expected response time"]
-            # delay = response_time - current_time
-            delay = 0
+        res = functions.receive_messages(client, thread.id, run_id)
+        character_answer = functions.parse_user_message(res)
+        current_time = time.time()
+        response_time = character_answer["Expected response time"]
+        # TODO we can Delay here: delay = response_time - current_time
+        delay = 0
 
-            # TODO Hunter - Send that to ManyChat:
-            if delay > 0:
-                time.sleep(delay)
-                print(character_answer["Harry response to text message"])
-            else:
-                print(character_answer["Harry response to text message"])
+        # TODO Hunter - Send that to ManyChat:
+        if delay > 0:
+            time.sleep(delay)
+            print(character_answer["Harry response to text message"])
+        else:
+            print(character_answer["Harry response to text message"])
     except:
         print("The user just does not answer")
