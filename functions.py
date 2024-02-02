@@ -123,7 +123,7 @@ def parse_world_message(response):
 
     # 2. Adjust character file
     user_file_pattern = re.compile(
-        r'\!Current Time Stamp\!\s+(.+?)\s+\!Character Memory\!\s+([\s\S]+?)\s+\!Is Harry texting the user\?\!\s+(\w+):\s*"?([\s\S]+?)"?\s+\!Other keys to be updated\?\!\s+(\w+)',
+        r'!Current Time Stamp!\s+(.+?)\s+!Character Memory!\s+([\s\S]+?)\s+!Is Harry texting the user\?!\s+(\w+):\s*?([\s\S]+?)?\s+!Other keys to be updated\?! (\w+): ([^\n]+)',
         re.DOTALL)
     user_file_match = user_file_pattern.search(response)
 
