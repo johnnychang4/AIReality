@@ -4,6 +4,12 @@ from datetime import datetime
 import os
 import re
 from prompts import assistant_instructions
+from dotenv import load_dotenv
+import requests
+import dotenv
+import os
+
+load_dotenv()
 
 
 # Create or load assistant
@@ -181,3 +187,31 @@ def message_from_system_into_assistant(client, assistant_id, thread_id):
 
     # Parse the results into a dictionary
     parse_world_message(response)
+
+
+def check_for_active_thread(active_thread_id):
+
+    # Replace 'your_openai_api_key' with your actual OpenAI API key
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    # Replace 'your_thread_id' with the specific thread ID
+    thread_id = 'your_thread_id'
+
+    url = f'https://api.openai.com/v1/threads/{active_thread_id}/runs'
+
+    headers = {
+        'Authorization': f'Bearer {api_key}',
+        'OpenAI-Beta': 'assistants=v1'
+    }
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        # If the request was successful, print the content
+        for run in response.json().get('data', []):
+            if run.get('status') == 'in_progress':
+                return True
+        return False
+    else:
+        # If the request failed, print the status code
+        print("Failed with status code:", response.json())

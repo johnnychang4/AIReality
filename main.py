@@ -51,7 +51,10 @@ while True:
 
     # Send message to Assistant API
     will_user_answer = True
-    try:
+    # Avoids error where both requests interfere
+    # TODO we could add a queue here later with scheduler
+    active_run = functions.check_for_active_thread(thread.id)
+    if not active_run:
         run_id = functions.send_message(client, assistant_id, thread.id, modified_user_message)
         print("Run started with ID:", run_id)
         start_time = time.time()
@@ -68,5 +71,5 @@ while True:
             print(character_answer["Harry response to text message"])
         else:
             print(character_answer["Harry response to text message"])
-    except:
-        print("The user just does not answer")
+    else:
+        print("Harry does not reply")
