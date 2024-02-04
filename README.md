@@ -17,8 +17,8 @@ This project simulates the events occurring in the Harry Potter world in real-ti
 2. run ```python3 main.py```
 3. open another terminal and run ```ngrok http http://localhost:8080```
 4. Copy the forward URL that looks something like this : https://5d90-128-12-123-216.ngrok-free.app
-5. Go to Manychat and find the automation, paste the URL into 3 places: Create Thread, Start Run, Check Run
-6. Update, get the Whatsapp link and run the link on your phone
+5. Go to Twilio and find the automation, paste the URL into Sandbox Configuration here: https://console.twilio.com/us1/develop/sms/try-it-out/whatsapp-learn. Make sure to add /receive-messages as endpoint
+6. Send messages to the test number via WhatsApp
 
 ## User Guide
 
@@ -30,6 +30,12 @@ This project simulates the events occurring in the Harry Potter world in real-ti
 ...
 
 ## Usage
+
+The following environment variables will be needed: 
+1. TWILIO_AUTH_TOKEN
+2. TWILIO_ACCOUNT_SID
+3. WORLD_UPDATE_INTERVAL
+4. OPENAI_API_KEY
 
 ...
 

@@ -1,18 +1,17 @@
 import json
 import time
 from datetime import datetime
-import os
 import re
 from prompts import assistant_instructions
 from dotenv import load_dotenv
 import requests
-import dotenv
 import os
+from twilio.rest import Client
 
 load_dotenv()
 
 
-# Create or load assistant
+# Create or load assistant from Assistant API
 def create_assistant(client):
     assistant_file_path = 'assistant.json'
 
@@ -23,12 +22,10 @@ def create_assistant(client):
             assistant_id = assistant_data['assistant_id']
             print("Loaded existing assistant ID.")
     else:
-        # If no assistant.json is present, create a new assistant using the below specifications
-
-        world_model_file = client.files.create(file=open("storage_json/world_storage.json", "rb"),
-                                               purpose='assistants')
-        character_model_file = client.files.create(file=open("storage_json/character_storage.json", "rb"),
-                                                   purpose='assistants')
+        client.files.create(file=open("storage_json/world_storage.json", "rb"),
+                            purpose='assistants')
+        client.files.create(file=open("storage_json/character_storage.json", "rb"),
+                            purpose='assistants')
 
         assistant = client.beta.assistants.create(
             # Change prompting in prompts.py file
@@ -45,7 +42,7 @@ def create_assistant(client):
     return assistant_id
 
 
-# Clock to send periodic updates
+# Clock that sends periodic updates to OpenAI for world updates
 def start_periodic_check(interval, function, *args):
     next_call = time.time()
     while True:
@@ -54,19 +51,21 @@ def start_periodic_check(interval, function, *args):
         time.sleep(next_call - time.time())
 
 
+# Helper function to generate uniformly structured date element
 def generate_current_time():
     now = datetime.now()
     current_time = now.strftime("%Y/%m/%d %H:%M:%S")
     return current_time
 
 
+# Extract the values that need to be updated in user file using a regular expressions
 def parse_user_message(message):
-    # Extract the values of the relevant variables using regular expressions
-    variables = re.findall(r'\!(.*?)\! (.*?)\n', message)
+    variables = re.findall(r'!(.*?)! (.*?)\n', message)
     variables_dict = {var[0]: var[1] for var in variables}
     return variables_dict
 
 
+# OpenAI send method
 def send_message(client, assistant_id, thread_id, message):
     client.beta.threads.messages.create(thread_id=thread_id,
                                         role="user",
@@ -76,6 +75,7 @@ def send_message(client, assistant_id, thread_id, message):
     return run.id
 
 
+# OpenAI receive method
 def receive_messages(client, thread_id, run_id):
     run = client.beta.threads.runs.retrieve(thread_id=thread_id,
                                             run_id=run_id)
@@ -90,6 +90,7 @@ def receive_messages(client, thread_id, run_id):
     return message.content[0].text.value
 
 
+# Add new event to the world file
 def append_event_to_world(world_event):
     world_path = 'storage_json/world_storage.json'
     with open(world_path, 'r') as world_file:
@@ -99,6 +100,7 @@ def append_event_to_world(world_event):
         json.dump(data, file, indent=4)
 
 
+# Add character updates to the character file
 def update_character_file(character_file_updates):
     character_path = 'storage_json/character_storage.json'
     with open(character_path, 'r') as character_file:
@@ -110,15 +112,14 @@ def update_character_file(character_file_updates):
         json.dump(data, file, indent=4)
 
 
-def parse_world_message(response):
+def parse_world_message(response, thread_id, user, harry):
+    print("Response from Assistant API:")
     print(response)
-    # 1. Append to world file
-    # TODO Check this regex, runs into problems sometimes
-    #world_file_pattern = re.compile(r'\!Time\! "(.+?)"\s+\!Output\! "(.+?)"', re.DOTALL)
+
+    # Append to world file after regex matching
     world_file_pattern = re.compile(r'!Time!\s+(.+?)\s+!Output!\s+(.+)', re.DOTALL)
     world_file_match = world_file_pattern.search(response)
     if world_file_match:
-        # Extract the matched groups
         world_event = {
             'timestamp': world_file_match.group(1),
             'event_description': world_file_match.group(2)
@@ -127,36 +128,45 @@ def parse_world_message(response):
     else:
         print("No match found in the response.")
 
-    # 2. Adjust character file
+    # Append to character file after regex matching
     user_file_pattern = re.compile(
         r'!Current Time Stamp!\s+(.+?)\s+!Character Memory!\s+([\s\S]+?)\s+!Is Harry texting the user\?!\s+(\w+):\s*?([\s\S]+?)?\s+!Other keys to be updated\?! (\w+)(?:: ([^\n]+))?',
         re.DOTALL)
     user_file_match = user_file_pattern.search(response)
 
+    # Timestamp of world event occurrence
     character_timestamp = user_file_match.group(1)
 
+    # Update for characters recent memory
     character_file_updates = {
         "Character’s Memory": user_file_match.group(2)
     }
 
-    # Handling "Is Harry texting the user?"
+    # Check if Harry is texting the user ("Is Harry texting the user?")
     harry_texting = user_file_match.group(3)
     if harry_texting == "YES":
         message_to_user = user_file_match.group(4).strip(": ")
-        print(message_to_user)
+        active_run = check_for_active_run(thread_id)
 
-    # Handling "Other keys to be updated?"
+        # Send message to user in case Harry wants to send a message
+        if not active_run:
+            send_whatsapp(message_to_user, user, harry)
+
+    # Handling "Other keys to be updated?" for character file updates
     other_keys_pattern = re.compile(r'([^:]+): ([^:]+)')
     other_keys = user_file_match.group(5)
     if other_keys == "YES":
         other_keys_data = user_file_match.group(6)
-        if other_keys_data:  # Checking if other_keys_data is not None
+        if other_keys_data:
             for key, value in other_keys_pattern.findall(other_keys_data):
                 character_file_updates[key.strip()] = value.strip()
+
+    # Update the character file with newly generated character changes
     update_character_file(character_file_updates)
 
 
-def message_from_system_into_assistant(client, assistant_id, thread_id):
+# Get world updates from the Assistant API
+def message_from_system_into_assistant(client, assistant_id, thread_id, user, harry):
     character_path = 'storage_json/character_storage.json'
     world_path = 'storage_json/world_storage.json'
 
@@ -171,7 +181,7 @@ def message_from_system_into_assistant(client, assistant_id, thread_id):
     # Generate current timestamp
     current_time = generate_current_time()
 
-    # Craft final input message
+    # Craft final input message for Assistant API
     message = f"""
     [Character file] {character}
     [World file] {world} 
@@ -186,17 +196,14 @@ def message_from_system_into_assistant(client, assistant_id, thread_id):
     response = receive_messages(client, thread_id, run_id)
 
     # Parse the results into a dictionary
-    parse_world_message(response)
+    parse_world_message(response, thread_id, user, harry)
 
 
-def check_for_active_thread(active_thread_id):
-
-    # Replace 'your_openai_api_key' with your actual OpenAI API key
+# Checks if thread has an active run (interference)
+def check_for_active_run(active_thread_id):
     api_key = os.getenv("OPENAI_API_KEY")
 
-    # Replace 'your_thread_id' with the specific thread ID
-    thread_id = 'your_thread_id'
-
+    # Endpoint to get #runs for  thread
     url = f'https://api.openai.com/v1/threads/{active_thread_id}/runs'
 
     headers = {
@@ -207,11 +214,29 @@ def check_for_active_thread(active_thread_id):
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
-        # If the request was successful, print the content
         for run in response.json().get('data', []):
-            if run.get('status') == 'in_progress':
+
+            # Status "in_progress" and "queued" are problematic
+            if run.get('status') == 'in_progress' or run.get('status') == 'queued':
                 return True
         return False
     else:
-        # If the request failed, print the status code
         print("Failed with status code:", response.json())
+
+
+# Message to user initiated by Harry through world update
+def send_whatsapp(message, user, harry):
+    # TODO Only works with Meta Business Account (software-initiated)
+
+    # Find your Account SID and Auth Token at twilio.com/console
+    account_sid = os.environ['TWILIO_ACCOUNT_SID']
+    auth_token = os.environ['TWILIO_AUTH_TOKEN']
+    client = Client(account_sid, auth_token)
+
+    # Craft request for Twilio and send it
+    message = client.messages.create(
+        body=message,
+        from_='whatsapp:' + harry,
+        to='whatsapp:' + user
+    )
+    print(message.sid)
